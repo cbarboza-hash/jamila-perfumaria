@@ -140,11 +140,17 @@ document.getElementById("btn-finalizar").addEventListener("click", async () => {
     const formaPagto = document.querySelector('input[name="forma-pagto"]:checked').value;
     const dataAtual = new Date().toLocaleString("pt-BR");
 
+    const subtotalTexto = txtTotal.innerText
+    .replace("R$", "")
+    .replace(/\./g, "")
+    .replace(",", ".")
+    .trim();
+
     const dadosVenda = {
         data: dataAtual,
         itens: textoItens,
         quantidades: textoQuantidades,
-        valorTotal: txtTotal.innerText,
+        valorTotal: parseFloat(subtotalTexto),
         formaPagamento: formaPagto.toUpperCase()
     };
 
@@ -154,7 +160,7 @@ document.getElementById("btn-finalizar").addEventListener("click", async () => {
     try {
         const resposta = await fetch(WEB_APP_URL, {
             method: "POST",
-            method: "POST",
+            mode: "cors",
             body: JSON.stringify(dadosVenda)
         });
         
