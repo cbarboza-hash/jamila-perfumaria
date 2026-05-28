@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Relatório de Vendas</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <header>
+        <h1>📊 Relatório de Vendas</h1>
+    </header>
+
+    <div class="container">
+
+        <div class="caixa-section" style="width:100%;">
+
+            <div style="
+                display:grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap:15px;
+                margin-bottom:20px;
+            ">
+
+                <div>
+                    <label>Data</label>
+                    <input type="date" id="filtro-data">
+                </div>
+
+                <div>
+                    <label>Produto</label>
+                    <input type="text" id="filtro-produto" placeholder="Nome do produto">
+                </div>
+
+                <div>
+                    <label>Forma de Pagamento</label>
+
+                    <select id="filtro-pagamento">
+
+                        <option value="">
+                            Todos
+                        </option>
+
+                        <option value="DINHEIRO">
+                            Dinheiro
+                        </option>
+
+                        <option value="CARTAO">
+                            Cartão
+                        </option>
+
+                        <option value="PIX">
+                            PIX
+                        </option>
+
+                    </select>
+                </div>
+
+            </div>
+
+            <button id="btn-filtrar" class="btn-finalizar">
+                Filtrar
+            </button>
+
+            <hr>
+
+            <h2>Total do Período</h2>
+
+            <h1 id="valor-total-geral">
+                R$ 0,00
+            </h1>
+
+            <hr>
+
+            <div id="lista-relatorio">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="relatorio.js"></script>
+
+</body>
+
+</html>
