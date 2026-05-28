@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Perfumaria - Controle de Caixa e Estoque</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <header>
@@ -13,64 +16,173 @@
     </header>
 
     <div class="container">
+
+        <!-- PRODUTOS -->
         <main class="produtos-section">
+
             <h2>Produtos em Estoque</h2>
+
             <div id="grid-produtos" class="grid-produtos">
-                <p style="padding: 20px; color:#666;">Carregando produtos da planilha...</p>
+                <p style="padding:20px; color:#666;">
+                    Carregando produtos da planilha...
+                </p>
             </div>
+
         </main>
 
+        <!-- CAIXA -->
         <aside class="caixa-section">
+
             <h2>🛒 Carrinho / Fechamento</h2>
-            
+
+            <!-- ITENS DO CARRINHO -->
             <div id="itens-carrinho" class="itens-carrinho">
-                <p style="color: #999; text-align: center; padding: 20px;">Carrinho vazio</p>
+
+                <p class="carrinho-vazio">
+                    Carrinho vazio
+                </p>
+
             </div>
 
             <hr>
 
+            <!-- PAGAMENTO -->
             <div class="pagamento-box">
+
                 <h3>Forma de Pagamento</h3>
+
                 <label class="radio-label">
-                    <input type="radio" name="forma-pagto" value="dinheiro" checked> 💵 Dinheiro
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="forma-pagto" value="cartao"> 💳 Cartão
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="forma-pagto" value="pix"> 📱 PIX
+                    <input 
+                        type="radio" 
+                        name="forma-pagto" 
+                        value="dinheiro" 
+                        checked
+                    >
+                    💵 Dinheiro
                 </label>
 
+                <label class="radio-label">
+                    <input 
+                        type="radio" 
+                        name="forma-pagto" 
+                        value="cartao"
+                    >
+                    💳 Cartão
+                </label>
+
+                <label class="radio-label">
+                    <input 
+                        type="radio" 
+                        name="forma-pagto" 
+                        value="pix"
+                    >
+                    📱 PIX
+                </label>
+
+                <!-- DESCONTO -->
                 <div class="desconto-dinheiro-box">
-                    <label for="desconto-extra">Desconto Extra (Dinheiro):</label>
+
+                    <label for="desconto-extra">
+                        Desconto Extra (Dinheiro)
+                    </label>
+
                     <div class="input-grupo">
-                        <input type="number" id="desconto-extra" placeholder="Ex: 5" min="0">
+
+                        <input
+                            type="number"
+                            id="desconto-extra"
+                            placeholder="Ex: 5"
+                            min="0"
+                            max="100"
+                            step="1"
+                        >
+
                         <span>%</span>
+
                     </div>
+
                 </div>
+
             </div>
 
             <hr>
 
+            <!-- TOTAIS -->
             <div class="totais">
+
                 <div class="total-linha">
                     <span>Subtotal:</span>
                     <span id="valor-subtotal">R$ 0,00</span>
                 </div>
+
                 <div class="total-linha">
                     <span>Desconto Extra:</span>
-                    <span id="valor-desconto" class="texto-desconto">- R$ 0,00</span>
+                    <span id="valor-desconto" class="texto-desconto">
+                        - R$ 0,00
+                    </span>
                 </div>
+
                 <div class="total-linha total-geral">
                     <span>Total a Pagar:</span>
                     <span id="valor-total">R$ 0,00</span>
                 </div>
+
             </div>
 
-            <button id="btn-finalizar" class="btn-finalizar">Finalizar Venda</button>
+            <!-- BOTÃO -->
+            <button id="btn-finalizar" class="btn-finalizar">
+                Finalizar Venda
+            </button>
+
         </aside>
+
     </div>
 
+    <!-- TEMPLATE DO ITEM DO CARRINHO -->
+    <!-- O JS vai renderizar os botões + / - automaticamente -->
+    <template id="template-item-carrinho">
+
+        <div class="item-carrinho">
+
+            <div class="item-info">
+
+                <div class="item-nome"></div>
+
+                <div class="controle-quantidade">
+
+                    <button class="btn-qtd btn-menos">
+                        -
+                    </button>
+
+                    <span class="item-qtd">
+                        1
+                    </span>
+
+                    <button class="btn-qtd btn-mais">
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="item-direita">
+
+                <div class="item-total">
+                    R$ 0,00
+                </div>
+
+                <button class="btn-remover">
+                    Remover
+                </button>
+
+            </div>
+
+        </div>
+
+    </template>
+
     <script src="script.js"></script>
+
 </body>
 </html>
