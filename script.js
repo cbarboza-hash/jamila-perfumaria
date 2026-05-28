@@ -1,7 +1,6 @@
 // LINK DO SEU GOOGLE APPS SCRIPT (Cole aqui a URL que você copiou no passo de implantação)
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx0u4QmQoU3Z0o3SEDIZNcfM0wD2S4jpLvoaEUIayIkLuSHi1rncjUtWlFcwJx6DQQ/exec";
 
-
 let produtosDoEstoque = [];
 let carrinho = [];
 
