@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div style="
+        min-height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    ">
+
+        <div class="caixa-section" style="
+            max-width:400px;
+            width:100%;
+        ">
+
+            <h1 style="text-align:center;">
+                🔐 Login do Sistema
+            </h1>
+
+            <br>
+
+            <input
+                type="text"
+                id="usuario"
+                placeholder="Usuário"
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin-bottom:15px;
+                "
+            >
+
+            <input
+                type="password"
+                id="senha"
+                placeholder="Senha"
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin-bottom:15px;
+                "
+            >
+
+            <button
+                id="btn-login"
+                class="btn-finalizar"
+                style="width:100%;"
+            >
+                Entrar
+            </button>
+
+            <p
+                id="erro-login"
+                style="
+                    color:red;
+                    text-align:center;
+                    margin-top:15px;
+                "
+            ></p>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        // USUÁRIO E SENHA
+        const USER = "jamila";
+        const PASS = "Perfumaria";
+
+        document
+        .getElementById("btn-login")
+        .addEventListener("click", () => {
+
+            const usuario =
+                document.getElementById("usuario").value;
+
+            const senha =
+                document.getElementById("senha").value;
+
+            if (
+                usuario === USER &&
+                senha === PASS
+            ) {
+
+                localStorage.setItem(
+                    "logado",
+                    "true"
+                );
+
+                window.location.href = "index.html";
+
+            } else {
+
+                document.getElementById("erro-login")
+                .innerText = "Usuário ou senha inválidos";
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
