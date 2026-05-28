@@ -1,10 +1,10 @@
-// LINK DO SEU GOOGLE APPS SCRIPT (Cole aqui a URL que você copiou no passo de implantação)
+// LINK DO SEU GOOGLE APPS SCRIPT
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx0u4QmQoU3Z0o3SEDIZNcfM0wD2S4jpLvoaEUIayIkLuSHi1rncjUtWlFcwJx6DQQ/exec";
 
 let produtosDoEstoque = [];
 let carrinho = [];
 
-// Mapeando elementos do HTML
+// ELEMENTOS HTML
 const gridProdutos = document.getElementById("grid-produtos");
 const containerCarrinho = document.getElementById("itens-carrinho");
 const txtSubtotal = document.getElementById("valor-subtotal");
@@ -13,63 +13,119 @@ const txtTotal = document.getElementById("valor-total");
 const inputDescontoExtra = document.getElementById("desconto-extra");
 const opcoesPagamento = document.querySelectorAll('input[name="forma-pagto"]');
 
-// FUNÇÃO PARA BUSCAR PRODUTOS DA PLANILHA DO GOOGLE
+// =============================
+// BUSCAR PRODUTOS
+// =============================
 async function carregarProdutosDaPlanilha() {
     try {
+
         const resposta = await fetch(WEB_APP_URL);
+
         produtosDoEstoque = await resposta.json();
+
         renderizarProdutos();
+
     } catch (erro) {
-        gridProdutos.innerHTML = `<p style="color:red; padding:20px;">Erro ao carregar produtos: ${erro}</p>`;
+
+        gridProdutos.innerHTML = `
+            <p style="color:red; padding:20px;">
+                Erro ao carregar produtos: ${erro}
+            </p>
+        `;
     }
 }
 
-// FUNÇÃO PARA DESENHAR OS CARDS DE PRODUTOS DINAMICAMENTE
+// =============================
+// RENDERIZAR PRODUTOS
+// =============================
 function renderizarProdutos() {
+
     gridProdutos.innerHTML = "";
-    
+
     produtosDoEstoque.forEach(produto => {
+
         const card = document.createElement("div");
+
         card.classList.add("produto-card");
-        
-        // Verifica se tem promoção cadastrada na planilha para exibir as tags de desconto
-        let blocoPreco = `<p class="preco-atual">R$ ${produto.preco.toFixed(2).replace('.', ',')}</p>`;
+
+        let blocoPreco = `
+            <p class="preco-atual">
+                R$ ${produto.preco.toFixed(2).replace('.', ',')}
+            </p>
+        `;
+
         let tagPromo = "";
-        
+
         if (produto.promocao > 0) {
-            tagPromo = `<div class="badge-promo">-${produto.promocao}%</div>`;
+
+            tagPromo = `
+                <div class="badge-promo">
+                    -${produto.promocao}%
+                </div>
+            `;
+
             blocoPreco = `
-                <p class="preco-original">R$ ${produto.precoOriginal.toFixed(2).replace('.', ',')}</p>
-                <p class="preco-atual">R$ ${produto.preco.toFixed(2).replace('.', ',')}</p>
+                <p class="preco-original">
+                    R$ ${produto.precoOriginal.toFixed(2).replace('.', ',')}
+                </p>
+
+                <p class="preco-atual">
+                    R$ ${produto.preco.toFixed(2).replace('.', ',')}
+                </p>
             `;
         }
 
         card.innerHTML = `
             ${tagPromo}
+
             <h3>${produto.nome}</h3>
+
             ${blocoPreco}
-            <p class="estoque">Estoque: ${produto.estoque} un</p>
-            <button class="btn-adicionar" onclick="adicionarAoCarrinho(${produto.id})">Adicionar ao Carrinho</button>
+
+            <p class="estoque">
+                Estoque: ${produto.estoque} un
+            </p>
+
+            <button
+                class="btn-adicionar"
+                onclick="adicionarAoCarrinho(${produto.id})"
+            >
+                Adicionar ao Carrinho
+            </button>
         `;
+
         gridProdutos.appendChild(card);
+
     });
 }
 
-// FUNÇÃO ADICIONAR AO CARRINHO
+// =============================
+// ADICIONAR AO CARRINHO
+// =============================
 function adicionarAoCarrinho(idProduto) {
+
     const produto = produtosDoEstoque.find(p => p.id === idProduto);
+
     const itemJaNoCarrinho = carrinho.find(item => item.id === idProduto);
 
-    // Validação básica de estoque imposta pela planilha
-    const qtdAtualNoCarrinho = itemJaNoCarrinho ? itemJaNoCarrinho.quantidade : 0;
+    const qtdAtualNoCarrinho = itemJaNoCarrinho
+        ? itemJaNoCarrinho.quantidade
+        : 0;
+
+    // VALIDAÇÃO DE ESTOQUE
     if (qtdAtualNoCarrinho >= produto.estoque) {
+
         alert("Quantidade indisponível no estoque!");
+
         return;
     }
 
     if (itemJaNoCarrinho) {
+
         itemJaNoCarrinho.quantidade += 1;
+
     } else {
+
         carrinho.push({
             id: produto.id,
             nome: produto.nome,
@@ -81,70 +137,250 @@ function adicionarAoCarrinho(idProduto) {
     atualizarInterfaceDoCaixa();
 }
 
-// ATUALIZAR INTERFACE DO CAIXA
-function atualizarInterfaceDoCaixa() {
-    containerCarrinho.innerHTML = "";
-    let subtotal = 0;
+// =============================
+// ALTERAR QUANTIDADE
+// =============================
+function alterarQuantidade(idProduto, delta) {
 
-    if (carrinho.length === 0) {
-        containerCarrinho.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Carrinho vazio</p>';
-    }
+    const item = carrinho.find(i => i.id === idProduto);
 
-    carrinho.forEach(item => {
-        const totalDoItem = item.preco * item.quantidade;
-        subtotal += totalDoItem;
+    if (!item) return;
 
-        const linha = document.createElement("div");
-        linha.classList.add("item-linha");
-        linha.innerHTML = `
-            <span>${item.quantidade}x ${item.nome}</span>
-            <strong>R$ ${totalDoItem.toFixed(2).replace('.', ',')}</strong>
-        `;
-        containerCarrinho.appendChild(linha);
-    });
+    const produtoOriginal = produtosDoEstoque.find(
+        p => p.id === idProduto
+    );
 
-    let porcentagemDesconto = 0;
-    const formaPagamentoSelecionada = document.querySelector('input[name="forma-pagto"]:checked').value;
-    const campoDescontoBox = document.querySelector(".desconto-dinheiro-box");
+    const novaQuantidade = item.quantidade + delta;
 
-    if (formaPagamentoSelecionada === "dinheiro") {
-        campoDescontoBox.style.display = "block";
-        porcentagemDesconto = parseFloat(inputDescontoExtra.value) || 0;
-    } else {
-        campoDescontoBox.style.display = "none";
-        inputDescontoExtra.value = "";
-    }
+    // REMOVE ITEM SE ZERAR
+    if (novaQuantidade <= 0) {
 
-    const valorDesconto = (subtotal * porcentagemDesconto) / 100;
-    const totalGeral = subtotal - valorDesconto;
+        carrinho = carrinho.filter(
+            i => i.id !== idProduto
+        );
 
-    txtSubtotal.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-    txtDesconto.innerText = `- R$ ${valorDesconto.toFixed(2).replace('.', ',')}`;
-    txtTotal.innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-}
+        atualizarInterfaceDoCaixa();
 
-// MONITORADORES DE ALTERAÇÃO DE PAGAMENTO
-inputDescontoExtra.addEventListener("input", atualizarInterfaceDoCaixa);
-opcoesPagamento.forEach(radio => radio.addEventListener("change", atualizarInterfaceDoCaixa));
-
-// ENVIAR OS DADOS DA VENDA PARA A PLANILHA (POST)
-document.getElementById("btn-finalizar").addEventListener("click", async () => {
-    if (carrinho.length === 0) {
-        alert("O carrinho está vazio!");
         return;
     }
 
-    // Formata os dados no padrão solicitado: Itens separados por "|"
-    const textoItens = carrinho.map(item => item.nome).join(" | ");
-    const textoQuantidades = carrinho.map(item => item.quantidade).join(" | ");
-    const formaPagto = document.querySelector('input[name="forma-pagto"]:checked').value;
-    const dataAtual = new Date().toLocaleString("pt-BR");
+    // VALIDA ESTOQUE
+    if (novaQuantidade > produtoOriginal.estoque) {
+
+        alert("Não há estoque suficiente!");
+
+        return;
+    }
+
+    item.quantidade = novaQuantidade;
+
+    atualizarInterfaceDoCaixa();
+}
+
+// =============================
+// REMOVER ITEM
+// =============================
+function removerDoCarrinho(idProduto) {
+
+    carrinho = carrinho.filter(
+        item => item.id !== idProduto
+    );
+
+    atualizarInterfaceDoCaixa();
+}
+
+// =============================
+// ATUALIZAR INTERFACE
+// =============================
+function atualizarInterfaceDoCaixa() {
+
+    containerCarrinho.innerHTML = "";
+
+    let subtotal = 0;
+
+    // CARRINHO VAZIO
+    if (carrinho.length === 0) {
+
+        containerCarrinho.innerHTML = `
+            <p style="color:#999; text-align:center; padding:20px;">
+                Carrinho vazio
+            </p>
+        `;
+    }
+
+    // ITENS
+    carrinho.forEach(item => {
+
+        const totalDoItem = item.preco * item.quantidade;
+
+        subtotal += totalDoItem;
+
+        const linha = document.createElement("div");
+
+        linha.classList.add("item-linha");
+
+        linha.style.marginBottom = "15px";
+
+        linha.innerHTML = `
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                width:100%;
+                gap:10px;
+            ">
+
+                <div>
+
+                    <strong>${item.nome}</strong>
+
+                    <div style="
+                        margin-top:8px;
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                    ">
+
+                        <button
+                            onclick="alterarQuantidade(${item.id}, -1)"
+                        >
+                            -
+                        </button>
+
+                        <span>
+                            ${item.quantidade}
+                        </span>
+
+                        <button
+                            onclick="alterarQuantidade(${item.id}, 1)"
+                        >
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div style="text-align:right;">
+
+                    <strong>
+                        R$ ${totalDoItem.toFixed(2).replace('.', ',')}
+                    </strong>
+
+                    <br><br>
+
+                    <button
+                        onclick="removerDoCarrinho(${item.id})"
+                        style="
+                            background:#ff4d4d;
+                            border:none;
+                            color:white;
+                            padding:6px 10px;
+                            border-radius:6px;
+                            cursor:pointer;
+                        "
+                    >
+                        Remover
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+        containerCarrinho.appendChild(linha);
+    });
+
+    // PAGAMENTO
+    let porcentagemDesconto = 0;
+
+    const formaPagamentoSelecionada = document.querySelector(
+        'input[name="forma-pagto"]:checked'
+    ).value;
+
+    const campoDescontoBox = document.querySelector(
+        ".desconto-dinheiro-box"
+    );
+
+    if (formaPagamentoSelecionada === "dinheiro") {
+
+        campoDescontoBox.style.display = "block";
+
+        porcentagemDesconto =
+            parseFloat(inputDescontoExtra.value) || 0;
+
+    } else {
+
+        campoDescontoBox.style.display = "none";
+
+        inputDescontoExtra.value = "";
+    }
+
+    const valorDesconto =
+        (subtotal * porcentagemDesconto) / 100;
+
+    const totalGeral =
+        subtotal - valorDesconto;
+
+    txtSubtotal.innerText =
+        `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+
+    txtDesconto.innerText =
+        `- R$ ${valorDesconto.toFixed(2).replace('.', ',')}`;
+
+    txtTotal.innerText =
+        `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+}
+
+// =============================
+// EVENTOS
+// =============================
+inputDescontoExtra.addEventListener(
+    "input",
+    atualizarInterfaceDoCaixa
+);
+
+opcoesPagamento.forEach(radio =>
+    radio.addEventListener(
+        "change",
+        atualizarInterfaceDoCaixa
+    )
+);
+
+// =============================
+// FINALIZAR VENDA
+// =============================
+document
+.getElementById("btn-finalizar")
+.addEventListener("click", async () => {
+
+    if (carrinho.length === 0) {
+
+        alert("O carrinho está vazio!");
+
+        return;
+    }
+
+    const textoItens =
+        carrinho.map(item => item.nome).join(" | ");
+
+    const textoQuantidades =
+        carrinho.map(item => item.quantidade).join(" | ");
+
+    const formaPagto =
+        document.querySelector(
+            'input[name="forma-pagto"]:checked'
+        ).value;
+
+    const dataAtual =
+        new Date().toLocaleString("pt-BR");
 
     const subtotalTexto = txtTotal.innerText
-    .replace("R$", "")
-    .replace(/\./g, "")
-    .replace(",", ".")
-    .trim();
+        .replace("R$", "")
+        .replace(/\./g, "")
+        .replace(",", ".")
+        .trim();
 
     const dadosVenda = {
         data: dataAtual,
@@ -154,34 +390,56 @@ document.getElementById("btn-finalizar").addEventListener("click", async () => {
         formaPagamento: formaPagto.toUpperCase()
     };
 
-    document.getElementById("btn-finalizar").innerText = "Salvando na planilha...";
-    document.getElementById("btn-finalizar").disabled = true;
+    const btnFinalizar =
+        document.getElementById("btn-finalizar");
+
+    btnFinalizar.innerText =
+        "Salvando na planilha...";
+
+    btnFinalizar.disabled = true;
 
     try {
+
         const resposta = await fetch(WEB_APP_URL, {
             method: "POST",
             mode: "cors",
             body: JSON.stringify(dadosVenda)
         });
-        
+
         const resultado = await resposta.json();
-        
-        if(resultado.status === "success") {
-            alert("Venda registrada com sucesso no Google Sheets!");
+
+        if (resultado.status === "success") {
+
+            alert("Venda registrada com sucesso!");
+
             carrinho = [];
+
             inputDescontoExtra.value = "";
-            await carregarProdutosDaPlanilha(); // Recarrega os produtos para atualizar os números de estoque na tela
+
+            await carregarProdutosDaPlanilha();
+
             atualizarInterfaceDoCaixa();
+
         } else {
+
             alert("Erro ao salvar: " + resultado.message);
         }
-    } catch(erro) {
-        alert("Erro na comunicação com a planilha: " + erro);
+
+    } catch (erro) {
+
+        alert(
+            "Erro na comunicação com a planilha: " + erro
+        );
+
     } finally {
-        document.getElementById("btn-finalizar").innerText = "Finalizar Venda";
-        document.getElementById("btn-finalizar").disabled = false;
+
+        btnFinalizar.innerText = "Finalizar Venda";
+
+        btnFinalizar.disabled = false;
     }
 });
 
-// INICIALIZAÇÃO
+// =============================
+// INICIAR SISTEMA
+// =============================
 carregarProdutosDaPlanilha();
