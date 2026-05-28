@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfumaria - Controle de Caixa e Estoque</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>✨ Perfumaria - Sistema de Caixa</h1>
+    </header>
+
+    <div class="container">
+        <main class="produtos-section">
+            <h2>Produtos em Estoque</h2>
+            <div id="grid-produtos" class="grid-produtos">
+                <p style="padding: 20px; color:#666;">Carregando produtos da planilha...</p>
+            </div>
+        </main>
+
+        <aside class="caixa-section">
+            <h2>🛒 Carrinho / Fechamento</h2>
+            
+            <div id="itens-carrinho" class="itens-carrinho">
+                <p style="color: #999; text-align: center; padding: 20px;">Carrinho vazio</p>
+            </div>
+
+            <hr>
+
+            <div class="pagamento-box">
+                <h3>Forma de Pagamento</h3>
+                <label class="radio-label">
+                    <input type="radio" name="forma-pagto" value="dinheiro" checked> 💵 Dinheiro
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="forma-pagto" value="cartao"> 💳 Cartão
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="forma-pagto" value="pix"> 📱 PIX
+                </label>
+
+                <div class="desconto-dinheiro-box">
+                    <label for="desconto-extra">Desconto Extra (Dinheiro):</label>
+                    <div class="input-grupo">
+                        <input type="number" id="desconto-extra" placeholder="Ex: 5" min="0">
+                        <span>%</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="totais">
+                <div class="total-linha">
+                    <span>Subtotal:</span>
+                    <span id="valor-subtotal">R$ 0,00</span>
+                </div>
+                <div class="total-linha">
+                    <span>Desconto Extra:</span>
+                    <span id="valor-desconto" class="texto-desconto">- R$ 0,00</span>
+                </div>
+                <div class="total-linha total-geral">
+                    <span>Total a Pagar:</span>
+                    <span id="valor-total">R$ 0,00</span>
+                </div>
+            </div>
+
+            <button id="btn-finalizar" class="btn-finalizar">Finalizar Venda</button>
+        </aside>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
